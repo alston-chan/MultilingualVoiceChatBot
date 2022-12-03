@@ -1,11 +1,29 @@
 # MultilingualVoiceChatBot
 Learn a new language with our multilingual voice chatbot!
 
+## Recommended Use of Virtual Environments
+
+Use virtual environments to manage packages so you don't break local machine versions:
+https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/
+
+Useful commands listed for convenience: 
+
+- ### Installing venv (virtual environment)
+  `python3 -m pip install --user virtualenv`
+
+- ### Creating and Activating venv 
+  `python3 -m venv env_name` \
+  `source env_name/bin/activate`
+
+- ### Installing in virtual env using requirements.txt 
+  `python3 -m pip install -r requirements.txt`
+
 ## Download and Install
 
 pip:
  - Run `pip install -r requirements.txt`
  - Or manually install packages in `requirements.txt`
+ - Or skip if using virtual enviornments
 
 Google Cloud Setup:
 
