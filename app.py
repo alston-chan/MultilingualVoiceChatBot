@@ -24,13 +24,19 @@ def chat(input_audio, target_language):
     romanized_input = romanize_text(transcribed_input)
     translated_input = translate_text(transcribed_input, "en")
 
+    return transcribed_input, romanized_input, translated_input
+
+
+def respond(translated_input):
     bot_text_output = generate_text(
         godel_model, godel_tokenizer, '', '', translated_input, 0.9, 8, 64)
-    bot_translated_text_output = translate_text(bot_text_output, "zh")
+
+    bot_translated_text_output = translate_text(bot_text_output, "zh-TW")
+    bot_romanized_text_output = romanize_text(bot_translated_text_output)
 
     audio_output_path = synthesize_text(bot_translated_text_output)
 
-    return transcribed_input, romanized_input, translated_input, bot_translated_text_output, bot_text_output, audio_output_path
+    return bot_translated_text_output, bot_romanized_text_output, bot_text_output, audio_output_path
 
 
 def system_setup():
@@ -45,38 +51,48 @@ def create_app():
             target_language = gr.Dropdown(
                 ["Cantonese"], label="Target Language", show_label=True)
 
-            with gr.Box():
-                with gr.Row().style(equal_height=True):
-                    input_audio = gr.Audio(
-                        label="Input Audio",
-                        show_label=True,
-                        source="microphone",
-                        type="filepath"
-                    )
+            with gr.Row().style(equal_height=True):
+                with gr.Box():
+                    with gr.Column():
+                        input_audio = gr.Audio(
+                            label="Input Audio", show_label=True, source="microphone", type="filepath", elemid="input-audio-audioarea")
 
-                    btn = gr.Button("Transcribe")
+                        transcribe_button = gr.Button("Transcribe")
 
-            text = gr.Textbox(
-                label="Transcribed Input Text", show_label=True, elem_id="result-textarea")
+                        text = gr.Textbox(
+                            label="Transcribed Input Text", show_label=True, elem_id="result-textarea")
 
-            text_romanization = gr.Textbox(
-                label="Romanized Input Text", show_label=True, elem_id="result-romanization-textarea")
+                        text_romanization = gr.Textbox(
+                            label="Romanized Input Text", show_label=True, elem_id="result-romanization-textarea")
 
-            text_translation = gr.Textbox(
-                label="Translated Input Text", show_label=True, elem_id="result-translation-textarea"
-            )
+                        text_translation = gr.Textbox(
+                            label="Translated Input Text", show_label=True, elem_id="result-translation-textarea"
+                        )
+                with gr.Box():
+                    with gr.Column():
+                        bot_response_audio = gr.Audio(
+                            label="Bot Response Audio", show_label=True, type="filepath", elemid="bot-response-audio-audioarea")
 
-            bot_translated_response_text = gr.Textbox(
-                label="Bot Language Response", show_label=True, elemid='bot-language-response-textarea')
+                        generate_response_button = gr.Button(
+                            "Generate Response")
 
-            bot_response_text = gr.Textbox(
-                label="Bot Response", show_label=True, elemid="bot-response-textarea")
+                        bot_translated_response_text = gr.Textbox(
+                            label="Bot Language Response", show_label=True, elemid='bot-language-response-textarea')
 
-            bot_response_audio = gr.Audio(type="filepath",
-                                          label="Bot Response Audio", show_label=True, elemid="bot-response-audio-audioarea")
+                        bot_romanized_response_text = gr.Textbox(
+                            label="Bot Romanized Response", show_label=True, elemid='bot-romanized-response-textarea'
+                        )
 
-            btn.click(chat, inputs=[
-                input_audio, target_language], outputs=[text, text_romanization, text_translation, bot_translated_response_text, bot_response_text, bot_response_audio])
+                    bot_response_text = gr.Textbox(
+                        label="Bot Response", show_label=True, elemid="bot-response-textarea")
+
+            transcribe_button.click(chat,
+                                    inputs=[input_audio, target_language],
+                                    outputs=[text, text_romanization, text_translation])
+
+            generate_response_button.click(respond,
+                                           inputs=[text_translation],
+                                           outputs=[bot_translated_response_text, bot_romanized_response_text, bot_response_text, bot_response_audio])
     return app
 
 
