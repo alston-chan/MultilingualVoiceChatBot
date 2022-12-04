@@ -17,7 +17,6 @@ from transformers import (
 
 
 def chat(input_audio, target_language):
-
     transcribed_input = transcribe_speech(
         input_audio, target_language, whisper_model)
 
@@ -54,45 +53,43 @@ def create_app():
             with gr.Row().style(equal_height=True):
                 with gr.Box():
                     with gr.Column():
-                        input_audio = gr.Audio(
-                            label="Input Audio", show_label=True, source="microphone", type="filepath", elemid="input-audio-audioarea")
+                        user_input_audio = gr.Audio(
+                            label="User Input Audio", show_label=True, source="microphone", type="filepath")
 
                         transcribe_button = gr.Button("Transcribe")
 
-                        text = gr.Textbox(
-                            label="Transcribed Input Text", show_label=True, elem_id="result-textarea")
+                        user_transcribed_text = gr.Textbox(
+                            label="User Transcribed Text", show_label=True)
 
-                        text_romanization = gr.Textbox(
-                            label="Romanized Input Text", show_label=True, elem_id="result-romanization-textarea")
+                        user_romanized_text = gr.Textbox(
+                            label="User Romanized Text", show_label=True)
 
-                        text_translation = gr.Textbox(
-                            label="Translated Input Text", show_label=True, elem_id="result-translation-textarea"
-                        )
+                        user_translated_text = gr.Textbox(
+                            label="User Translated Text", show_label=True)
                 with gr.Box():
                     with gr.Column():
-                        bot_response_audio = gr.Audio(
-                            label="Bot Response Audio", show_label=True, type="filepath", elemid="bot-response-audio-audioarea")
+                        bot_output_audio = gr.Audio(
+                            label="Bot Output Audio", show_label=True, type="filepath")
 
                         generate_response_button = gr.Button(
                             "Generate Response")
 
-                        bot_translated_response_text = gr.Textbox(
-                            label="Bot Language Response", show_label=True, elemid='bot-language-response-textarea')
+                        bot_transcribed_text = gr.Textbox(
+                            label="Bot Transcribed Text", show_label=True)
 
-                        bot_romanized_response_text = gr.Textbox(
-                            label="Bot Romanized Response", show_label=True, elemid='bot-romanized-response-textarea'
-                        )
+                        bot_romanized_text = gr.Textbox(
+                            label="Bot Romanized Text", show_label=True)
 
-                    bot_response_text = gr.Textbox(
-                        label="Bot Response", show_label=True, elemid="bot-response-textarea")
+                        bot_translated_text = gr.Textbox(
+                            label="Bot Translated Text", show_label=True)
 
             transcribe_button.click(chat,
-                                    inputs=[input_audio, target_language],
-                                    outputs=[text, text_romanization, text_translation])
+                                    inputs=[user_input_audio, target_language],
+                                    outputs=[user_transcribed_text, user_romanized_text, user_translated_text])
 
             generate_response_button.click(respond,
-                                           inputs=[text_translation],
-                                           outputs=[bot_translated_response_text, bot_romanized_response_text, bot_response_text, bot_response_audio])
+                                           inputs=[user_translated_text],
+                                           outputs=[bot_transcribed_text, bot_romanized_text, bot_translated_text, bot_output_audio])
     return app
 
 
